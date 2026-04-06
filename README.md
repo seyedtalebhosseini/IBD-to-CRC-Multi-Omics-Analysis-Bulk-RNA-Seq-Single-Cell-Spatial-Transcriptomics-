@@ -1,1 +1,1 @@
-# IBD-to-CRC-Multi-Omics-Analysis-Bulk-RNA-Seq-Single-Cell-Spatial-Transcriptomics-
+# IBD to CRC Multi Omics Analysis (Bulk RNA Seq, Single Cell, Spatial Transcriptomics)
