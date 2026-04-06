@@ -1,0 +1,142 @@
+from google.colab import drive
+drive.mount('/content/drive')
+
+!pip install scikit-misc
+!pip install pot
+!pip install GraphST
+!pip install scanpy
+
+import os
+import torch
+import pandas as pd
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import scanpy as sc
+import skmisc
+import numpy as np
+import ot
+import anndata as ad
+from sklearn import metrics
+import multiprocessing as mp
+from GraphST import GraphST
+
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+os.environ['R_HOME'] = '/C:\Program Files\R\R-4.3.2'
+
+dataset = "directory of samples"
+file_fold = "spatial/" + str(dataset)
+data_spatial = sc.read_visium(file_fold, count_file= "filtered_feature_bc_matrix.h5" , load_images=True)
+data_spatial.var_names_make_unique()
+GraphST.preprocess(data_spatial)
+GraphST.construct_interaction(data_spatial)
+GraphST.add_contrastive_label(data_spatial)
+sc.pp.normalize_total(data_spatial, target_sum=1e4)
+sc.pp.log1p(data_spatial)
+sc.pp.highly_variable_genes(data_spatial, n_top_genes=2000)
+data_spatial = data_spatial[:, data_spatial.var['highly_variable']]
+data_singlecell = sc.read_h5ad("obj.h5ad")
+data_singlecell.var_names_make_unique()
+sc.pp.normalize_total(data_singlecell, target_sum=1e4)
+data_singlecell.X[data_singlecell.X < 0] = 0
+sc.pp.log1p(data_singlecell)
+data_singlecell.X = np.nan_to_num(data_singlecell.X, nan=0.0, posinf=0.0, neginf=0.0)
+sc.pp.filter_cells(data_singlecell, min_genes=1)
+sc.pp.filter_genes(data_singlecell, min_cells=1)
+sc.pp.highly_variable_genes(data_singlecell, n_top_genes=2000)
+data_singlecell = data_singlecell[:, data_singlecell.var['highly_variable']]
+GraphST.preprocess(data_singlecell)
+from GraphST.preprocess import filter_with_overlap_gene
+data_spatial, data_singlecell = filter_with_overlap_gene(data_spatial, data_singlecell)
+GraphST.get_feature(data_spatial)
+model = GraphST.GraphST(data_spatial, data_singlecell, epochs=1200, random_seed=50, device=device, deconvolution=True)
+data_spatial, data_singlecell = model.train_map()
+from GraphST.utils import project_cell_to_spot
+cell_types = ['cell type 1','cell type 2', ....]
+frequencies = {
+    'cell type 1':  0000,
+    'cell type 2':  0000,
+    .....,
+	.....
+}
+assert sum(frequencies.values()) == 0000
+cell_type_list = []
+for cell_type, freq in frequencies.items():
+    cell_type_list.extend([cell_type] * freq)
+data_singlecell.obs['cell_type'] = cell_type_list
+project_cell_to_spot(data_spatial, data_singlecell, retain_percent=0.15)
+data_spatial.write("Obj_Spatial.h5ad")
+
+import os
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import scanpy as sc
+
+# Define folder and file paths
+folder_path = "spatial/"
+os.makedirs(folder_path, exist_ok=True)
+
+tiff_path = os.path.join(folder_path, "normal.tiff")
+
+# Customize Matplotlib settings for larger figure and text
+with mpl.rc_context({
+    'axes.facecolor': 'black',
+    'figure.figsize': [8, 6],
+    'font.size': 40,
+    'axes.titlesize': 40,
+    'axes.labelsize': 40,
+    'legend.fontsize': 30
+}):
+    # Plot spatial data
+    sc.pl.spatial(
+        data_spatial,
+        cmap='magma',
+        color=[
+            'cell type 1','cell type 2', ......
+        ],
+        ncols=8,
+        size=2,
+        img_key='hires',
+        vmin=0,
+        vmax='p99.2',
+        show=False
+    )
+
+    # Save as TIFF (publication quality)
+    plt.savefig(
+        tiff_path,
+        format="tiff",
+        dpi=600,
+        bbox_inches="tight",
+        pil_kwargs={"compression": "tiff_lzw"}
+    )
+
+    plt.close()
+    
+    # Define folder and file paths
+folder_path = "spatial"
+os.makedirs(folder_path, exist_ok=True)
+pdf_path = os.path.join(folder_path, "Freq.pdf")
+
+# Customize Matplotlib settings for larger figure and text
+with mpl.rc_context({
+    'axes.facecolor': 'black',          # Background color
+    'figure.figsize': [7, 6],         # Increase figure size (doubled from 5x5)
+    'font.size': 30,                    # Increase general font size (titles, etc.)
+    'axes.titlesize': 30,               # Increase title size for each subplot
+    'axes.labelsize': 30,               # Increase label size if applicable
+    'legend.fontsize': 20               # Increase legend font size (if legend is enabled)
+}):
+    # Plot spatial data with adjusted parameters
+    sc.pl.spatial(
+        data_spatial,
+        cmap='magma',
+        color=['cell type 1','cell type 2', .....],
+        ncols=4,                       # Reduced to 3 columns for more space per plot
+        size=2,                      # Increase spot size (from 1.4 to 2.0)
+        img_key='hires',
+        vmin=0,
+        vmax='p99.2',
+        show=False                     # Prevent display to save directly
+    )
+    # Save the plot
+    plt.savefig(pdf_path, format="pdf", bbox_inches='tight', dpi=600)  # Higher DPI for quality

@@ -1,0 +1,6 @@
+library(Seurat)
+library(SeuratDisk)
+library(SeuratData)
+obj <- readRDS("obj.RDS")
+SaveH5Seurat(obj, filename = "obj.h5Seurat", overwrite = TRUE)
+Convert("obj.h5Seurat", dest = "h5ad", overwrite = TRUE)

@@ -1,0 +1,42 @@
+library(TCGAbiolinks)
+library(SummarizedExperiment)
+library(dplyr)
+
+projects <- c("TCGA-COAD", "TCGA-READ")
+
+query <- GDCquery(
+  project = projects,
+  data.category = "Transcriptome Profiling",
+  data.type = "Gene Expression Quantification",
+  workflow.type = "HTSeq - Counts"
+)
+
+
+GDCdownload(query)
+data <- GDCprepare(query)
+expression_matrix <- assay(data)
+clinical_data <- colData(data)
+gene_annotation <- rowData(data)
+write.csv(expression_matrix,
+          "TCGA_CRC_expression_counts.csv")
+write.csv(as.data.frame(clinical_data),
+          "TCGA_CRC_clinical_data.csv")
+write.csv(as.data.frame(gene_annotation),
+          "TCGA_CRC_gene_annotation.csv")
+tumor_samples <- TCGAquery_SampleTypes(
+  barcode = colnames(expression_matrix),
+  typesample = "TP"
+)
+
+tumor_expression <- expression_matrix[, tumor_samples]
+
+write.csv(tumor_expression,
+          "TCGA_CRC_tumor_only_counts.csv")
+
+clinical_crc <- GDCquery_clinic(
+  project = projects,
+  type = "clinical"
+)
+
+write.csv(clinical_crc,
+          "TCGA_CRC_full_clinical_data.csv")
