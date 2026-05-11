@@ -117,8 +117,6 @@ If you use the scripts in this repository, please cite:
 
 Hosseini, S.T., AminianToosi, K., Nemati, F. et al. Deciphering immune and cellular reprogramming during the progression from inflammatory bowel disease to colorectal cancer using multi-omics single-cell and spatial transcriptomics. J Transl Med 24, 591 (2026). https://doi.org/10.1186/s12967-026-08158-2
 
-License
-This repository is intended for academic and research purposes.
+License: This repository is intended for academic and research purposes.
 
-Contact
-For questions or collaboration inquiries, please contact the repository author.
+Contact: For questions or collaboration inquiries, please contact the repository author.
