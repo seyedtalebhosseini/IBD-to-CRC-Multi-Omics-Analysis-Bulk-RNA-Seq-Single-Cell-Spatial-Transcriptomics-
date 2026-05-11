@@ -1,11 +1,7 @@
 # IBD to CRC Multi Omics Analysis (Bulk RNA Seq, Single Cell, Spatial Transcriptomics)
 This repository contains analysis scripts used in the study:
 
-Deciphering Immune and Cellular Reprogramming During the Progression from Inflammatory Bowel Disease to Colorectal Cancer Using Multi-Omics Single-Cell and Spatial Transcriptomics
-
-Accepted for publication in Journal of Translational Medicine.
-
-Citation details and DOI will be added once the article is published.
+Hosseini, S.T., AminianToosi, K., Nemati, F. et al. Deciphering immune and cellular reprogramming during the progression from inflammatory bowel disease to colorectal cancer using multi-omics single-cell and spatial transcriptomics. J Transl Med 24, 591 (2026). https://doi.org/10.1186/s12967-026-08158-2
 
 Project Overview:
 This project investigates immune and cellular reprogramming during the progression from Inflammatory Bowel Disease (IBD) to Colorectal Cancer (CRC) using an integrative multi-omics framework combining:
@@ -120,9 +116,7 @@ GraphST
 Citation
 If you use the scripts in this repository, please cite:
 
-Deciphering Immune and Cellular Reprogramming During the Progression from Inflammatory Bowel Disease to Colorectal Cancer Using Multi‑Omics Single‑Cell and Spatial Transcriptomics
-
-Journal of Translational Medicine (Accepted)
+Hosseini, S.T., AminianToosi, K., Nemati, F. et al. Deciphering immune and cellular reprogramming during the progression from inflammatory bowel disease to colorectal cancer using multi-omics single-cell and spatial transcriptomics. J Transl Med 24, 591 (2026). https://doi.org/10.1186/s12967-026-08158-2
 
 License
 This repository is intended for academic and research purposes.
